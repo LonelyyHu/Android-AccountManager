@@ -158,4 +158,10 @@ class AccountAuthenticator(private val mContext: Context) : AbstractAccountAuthe
         return null
     }
 
+    override fun getAccountRemovalAllowed(response: AccountAuthenticatorResponse?, account: Account?): Bundle {
+
+        Log.wtf("AccountAuthenticator", "getAccountRemovalAllowed =>")
+
+        return super.getAccountRemovalAllowed(response, account)
+    }
 }
