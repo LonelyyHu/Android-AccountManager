@@ -51,4 +51,25 @@
         android:onClick="onClickRemoveAccount"
         android:text="remove account"/>
 
+    <Button
+        android:id="@+id/buttonList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClickListAccounts"
+        android:text="List accounts"/>
+
+    <Button
+        android:id="@+id/buttonSet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClickSetData"
+        android:text="Set Data"/>
+
+    <Button
+        android:id="@+id/buttonGet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClickGetData"
+        android:text="Get Data"/>
+
 </LinearLayout>

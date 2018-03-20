@@ -58,18 +58,19 @@ class MainActivity : AppCompatActivity() {
 
         listAccounts(ACCOUNT_TYPE)
 
-
         val am = getSystemService(ACCOUNT_SERVICE) as AccountManager
+
+        Log.wtf("MainActivity", "getAccount for type => $ACCOUNT_TYPE")
 
         val accounts = am.getAccountsByType(ACCOUNT_TYPE)
 
         for (acc in accounts) {
 
-            Log.wtf("MainActivity", "getPassword for accName => ${acc.name}")
+            Log.wtf("MainActivity", "account name => ${acc.name}")
 
-            val mail = am.getUserData(acc, "USER_EMAIL")
+            val mail = am.getUserData(acc, "accessTime")
 
-            Log.wtf("MainActivity", "USER_EMAIL => $mail")
+            Log.wtf("MainActivity", "accessTime => $mail")
 //            am.getPassword(acc)
 //            am.peekAuthToken(acc, ACCOUNT_TYPE)
         }
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permissions granted.
                 } else {
-                    checkPermissions()
+//                    checkPermissions()
                 }
                 return
             }

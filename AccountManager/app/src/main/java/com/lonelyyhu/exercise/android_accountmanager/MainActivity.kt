@@ -1,20 +1,31 @@
 package com.lonelyyhu.exercise.android_accountmanager
 
+import android.Manifest
 import android.os.Bundle
 import android.accounts.*
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.widget.TextView
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
+
+    var permissions = arrayOf<String>(
+            Manifest.permission.GET_ACCOUNTS
+    )
+    val REQ_PERMISSION_CODE = 100
+
 
     private var mAccountManager: AccountManager? = null
     private var mAuthPreferences: AuthPreference? = null
@@ -41,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         mAuthPreferences = AuthPreference(this)
         mAccountManager = AccountManager.get(this)
 
+        checkPermissions()
     }
 
     override fun onResume() {
@@ -91,8 +103,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onClickAddAccount(view: View) {
-        AccountUtils.getAccount(this@MainActivity, "aaaa")
-
         var account = Account("t-${Calendar.getInstance().timeInMillis}@exsample.com", AccountUtils.ACCOUNT_TYPE)
         mAccountManager!!.addAccountExplicitly(account, "password", null)
 
@@ -111,9 +121,12 @@ class MainActivity : AppCompatActivity() {
         val bundle = Bundle()
         bundle.putString("KEY", "aaa12345")
 
-        mAccountManager!!.getAuthToken(mAccount, AccountUtils.AUTH_TOKEN_TYPE, bundle, this, GetAuthTokenCallback(), null)
+        if (mAccount != null) {
+            mAccountManager!!.getAuthToken(mAccount, AccountUtils.AUTH_TOKEN_TYPE, bundle, this, GetAuthTokenCallback(), null)
+        } else {
+            Toast.makeText(this, "Account is null", Toast.LENGTH_SHORT).show();
+        }
 
-//        mAccountManager!!.
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
@@ -132,6 +145,68 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+    }
+
+    fun onClickListAccounts(view: View) {
+        val accountManager = AccountManager.get(this)
+        val accounts = accountManager.accounts
+
+        Log.wtf("MainActivity", "onClickListAccounts => all accounts size:${accounts.size}")
+
+        for (account in accounts) {
+            Log.wtf("MainActivity", "account name: ${account.name}, account type: ${account.type}")
+        }
+    }
+
+    fun onClickSetData(view: View) {
+
+        val account = AccountUtils.getFirstAccount(this)
+
+        val accountManager = AccountManager.get(this)
+
+        val data = Calendar.getInstance().timeInMillis.toString()
+
+        accountManager.setUserData(account, "accessTime", data)
+
+        Log.wtf("MainActivity", "onClickSetData => $data")
+    }
+
+    fun onClickGetData(view: View) {
+        val account = AccountUtils.getFirstAccount(this)
+
+        val accountManager = AccountManager.get(this)
+        val value = accountManager.getUserData(account, "accessTime")
+        Log.wtf("MainActivity", "onClickGetData => $value")
+    }
+
+    private fun checkPermissions(): Boolean {
+        var result: Int
+        val listPermissionsNeeded = arrayListOf<String>()
+        for (p in permissions) {
+            result = ContextCompat.checkSelfPermission(this, p)
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p)
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toTypedArray(), REQ_PERMISSION_CODE)
+            return false
+        }
+        return true
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQ_PERMISSION_CODE -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permissions granted.
+                } else {
+//                    checkPermissions()
+                }
+                return
+            }
+        }
     }
 
     private inner class GetAuthTokenCallback : AccountManagerCallback<Bundle> {
