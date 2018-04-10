@@ -22,7 +22,8 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     var permissions = arrayOf<String>(
-            Manifest.permission.GET_ACCOUNTS
+            Manifest.permission.GET_ACCOUNTS,
+            Manifest.permission.ACCOUNT_MANAGER
     )
     val REQ_PERMISSION_CODE = 100
 
